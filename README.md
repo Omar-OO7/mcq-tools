@@ -5,18 +5,27 @@ This is a command-line tool to:
 - Store them in memory
 - Interactively solve them with feedback and scoring
 
-### Features:
-- Duplicate question detection
-- Input validation (for question and answer options)
-- Custom class (`Question`) to store each MCQ
-- Works with 3-option (a, b, c) format
+## Features
+- Duplicate question detection  
+- Input validation (for question and answer options)  
+- Custom class (`Question`) to store each MCQ  
+- Works with **any number of options** (not just 3).  
+- Flexible input: options are numbered (1, 2, 3, …) instead of fixed a/b/c.  
+- Interactive solver with detailed feedback (`Correct` / `Incorrect`).  
 
-### Planned Features:
-- Add support for more than 3 options (d, e, etc.)
-- Save questions to a file
-- Load and resume quizzes
+## Changelog
 
-### How to Use:
-1. Run the script
-2. Choose to create questions
-3. Answer the quiz and get feedback!
+- **v1.1**
+  - Added support for n options in Question Maker.
+  - Improved input validation (no duplicate/empty options).
+  - Question Solver updated to accept numeric answers.
+  - Enhanced feedback messages and scoring system.
+
+- **v1.0**
+  - Initial release.
+  - Supported 3-option (a, b, c) format only.
+  - Duplicate detection and basic input validation.
+
+## Planned Features
+- Save questions to a file  
+- Load and resume quizzes  
