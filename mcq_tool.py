@@ -1,83 +1,89 @@
 class Question:
-    def __init__(self, prompt, answer):
+    def __init__(self, prompt, options, answer):
         self.prompt = prompt
+        self.options = options
         self.answer = answer
+
 
 def question_solver(prompt_list):
     total_questions = len(prompt_list)
     correct = 0
+
     for question in prompt_list:
-        if question.answer == "(a)" or question.answer == "a":
-            index1 = question.prompt.find("(a)")
-            index2 = question.prompt.find("(b)")
-            ans_full = question.prompt[index1:index2].replace("\n", "")
-        elif question.answer == "(b)" or question.answer == "b":
-            index1 = question.prompt.find("(b)")
-            index2 = question.prompt.find("(c)")
-            ans_full = question.prompt[index1:index2].replace("\n", "")
-        else:
-            index1 = question.prompt.find("(c)")
-            ans_full = question.prompt[index1:].replace("\n", "")
-        valid_option = False
-        answer = ""
-        while not valid_option:
-            answer = input(question.prompt).lower()
-            if answer not in ["a", "b", "c", "(a)", "(b)", "(c)"]:
-                print("Options are either 'a', 'b' or 'c'")
-            else:
-                valid_option = True
-        if answer == question.answer or answer == question.answer.replace("(", "").replace(")", ""):
+        print(question.prompt)
+        for opt in question.options:
+            print(opt)
+        while True:
+            try:
+                user_ans = int(input("Enter your answer (option number): "))
+                if 1 <= user_ans <= len(question.options):
+                    break
+                else:
+                    print(f"Please enter a number between 1 and {len(question.options)}.")
+            except ValueError:
+                print("Please enter a valid integer.")
+        if user_ans == question.answer:
             correct += 1
-            print(f"Correct, The answer was {ans_full}!")
+            print(f"Correct! The answer was {question.options[question.answer - 1]}\n")
         else:
-            print(f"Incorrect, The answer was {ans_full}")
-    print(f"Sadly you did not get any of the {total_questions} questions correct" if correct == 0 else f"Good effort, you got {correct} out of {total_questions} questions correct" if correct < total_questions/2 else f"{"Congratulations, you got all" if correct == total_questions else "Valiant effort, you got"} {correct} out of {total_questions} questions correct!")
+            print(f"Incorrect! The correct answer was {question.options[question.answer - 1]}\n")
+    if correct == 0:
+        print(f"Sadly, you did not get any of the {total_questions} questions correct.")
+    elif correct < total_questions / 2:
+        print(f"Good effort, you got {correct} out of {total_questions} correct.")
+    elif correct == total_questions:
+        print(f"Congratulations! You got all {total_questions} questions correct!")
+    else:
+        print(f"Nice work! You got {correct} out of {total_questions} correct.")
 
 def question_maker():
-    finished = False
     prompt_list = []
-    questions_list = []
+    questions_seen = set()
     question_num = 0
-    while not finished:
-        same_questions = False
-        while not same_questions:
+
+    while True:
+        while True:
             question = input(f"Enter the{'' if not prompt_list else ' next'} question\n")
-            question = f"{question}" if question.endswith('?') else f"{question}?"
-            is_duplicate = False
-            if question_num > 0:
-                for i in range(question_num):
-                    if question.lower() == questions_list[i].lower():
-                        print(f"You have entered the same question previously in Question Number {i + 1}, please enter a different question")
-                        is_duplicate = True
-                        break
-                if not is_duplicate:
-                    questions_list.append(f"{question}")
-                    same_questions = True
-            elif question_num == 0:
-                questions_list.append(f"{question}")
-                same_questions = True
-        same_options = False
-        option_a = option_b = option_c = ""
-        while not same_options:
-            option_a = input("Enter option a\n")
-            option_b = input("Enter option b\n")
-            option_c = input("Enter option c\n")
-            if option_a == option_b or option_a == option_c or option_b == option_c:
-                print(f"The options cannot be the same, enter them again")
+            if not question.endswith("?"):
+                question += "?"
+            if question.lower() in questions_seen:
+                print("You already entered this question. Try again.")
             else:
-                same_options = True
-        valid_option = False
-        answer = ""
-        while not valid_option:
-            answer = input("Enter the correct option\n(a/b/c)\n").lower()
-            if answer not in ["a", "b", "c", "(a)", "(b)", "(c)"]:
-                print("Option are either 'a', 'b' or 'c', enter again")
-            else:
-                valid_option = True
-        prompt_list.append(Question(f"Q{question_num + 1}){questions_list[question_num]}\n(a) {option_a}\n(b) {option_b}\n(c) {option_c}\n\n", answer))
-        next_question = input("Do you want to add more questions?\n(y/n)\n")
-        if next_question == "y":
-            question_num += 1
-        elif next_question == "n":
-            finished = True
+                questions_seen.add(question.lower())
+                break
+        while True:
+            try:
+                option_num = int(input("How many options do you want this question to have?\n"))
+                if option_num > 0:
+                    break
+                else:
+                    print("The number must be greater than 0.")
+            except ValueError:
+                print("Please enter a valid integer.")
+        options_list = []
+        for i in range(option_num):
+            while True:
+                temp = input(f"Enter option number {i + 1}:\n")
+                if temp.strip() == "":
+                    print("Option cannot be empty.")
+                elif temp.lower() in [opt.lower().split(")", 1)[1] for opt in options_list]:
+                    print("You already entered this option. Try again.")
+                else:
+                    options_list.append(f"{i + 1}) {temp}")
+                    break
+        while True:
+            try:
+                answer = int(input(f"Enter the correct option number (1-{option_num}):\n"))
+                if 1 <= answer <= option_num:
+                    break
+                else:
+                    print(f"Answer must be between 1 and {option_num}.")
+            except ValueError:
+                print("Please enter a valid integer.")
+        q_text = f"Q{question_num + 1}) {question}\n"
+        prompt_list.append(Question(q_text, options_list, answer))
+        next_question = input("Do you want to add more questions? (y/n)\n").lower()
+        if next_question != "y":
+            break
+        question_num += 1
     return prompt_list
